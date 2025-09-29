@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Basic URL Shortener</h1>
+
+        <form id="shortenerForm">
+            <input type="url" id="originalUrl" placeholder="Enter long URL" required>
+            <input type="text" id="customAlias" placeholder="Custom alias (optional)">
+            <button type="submit">Shorten</button>
+        </form>
+
+        <p id="result"></p>
+
+        <hr>
+
+        <a href="/export">Export CSV</a>
+    </div>
+
+    <script>
+
+        document.getElementById("shortenerForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const originalUrl = document.getElementById("originalUrl").value;
+            const customAlias = document.getElementById("customAlias").value;
+
+            let res = await fetch("/shorten", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({originalUrl, customAlias})
+            });
+
+            let data = await res.json();
+            if (data.error) {
+                document.getElementById("result").innerText = "Error:" + data.error;
+            } else {
+                document.getElementById("result").innerHTML = `
+                Short URL: <a href="${data.shortUrl}" target="_blank">${data.shortUrl}</a>
+                `;
+            }
+        })
+
+    </script>
+    
+</body>
+</html>
